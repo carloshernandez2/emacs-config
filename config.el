@@ -76,6 +76,7 @@
 ;; they are implemented.
 ;;
 ;;PERSONAL ---------------------
+(setq read-process-output-max (* 1024 1024))
 
 ;;Projectile
 (setq projectile-enable-caching nil
@@ -85,8 +86,6 @@
                                           projectile-root-bottom-up))
 
 ;;LSP
-(setq read-process-output-max (* 1024 1024))
-
 (use-package! lsp-mode
   :commands lsp
   :config
@@ -119,8 +118,10 @@ If a region is active, run `cider-eval-region'."
   (if (use-region-p)
       (cider-eval-region (region-beginning) (region-end))
     (cider-eval-last-sexp)))
-(setq cider-ns-code-reload-tool 'clj-reload)
-(setq cider-enrich-classpath t)
+
+(after! cider
+  (setq cider-ns-code-reload-tool 'clj-reload)
+  (setq cider-enrich-classpath t))
 
 ;; compat flag lispy
 (after! lispy
@@ -129,13 +130,6 @@ If a region is active, run `cider-eval-region'."
 ;; Github Copilot
 (use-package! copilot
   :hook (prog-mode . copilot-mode)
-  :bind (:map copilot-completion-map
-              ("<tab>" . 'copilot-accept-completion)
-              ("TAB" . 'copilot-accept-completion)
-              ("C-TAB" . 'copilot-accept-completion-by-word)
-              ("C-<tab>" . 'copilot-accept-completion-by-word)
-              ("C-n" . 'copilot-next-completion)
-              ("C-p" . 'copilot-previous-completion))
   :config
   (add-to-list 'copilot-indentation-alist '(prog-mode 2))
   (add-to-list 'copilot-indentation-alist '(org-mode 2))
@@ -153,38 +147,51 @@ If a region is active, run `cider-eval-region'."
  "C-M-n" #'kill-sexp
  "C-p" #'forward-char
  "M-p" #'forward-word
- "C-M-p" #'forward-list
+ "C-M-p" #'forward-sexp
  "C-k" #'backward-char
  "M-k" #'backward-word
- "C-M-k" #'backward-list
+ "C-M-k" #'backward-sexp
  "C-l" #'next-line
  "C-o" 'previous-line
-
- ;; lispy
+ "M-M" #'mc/mark-next-like-this
+ "M-i" #'iedit-mode
+ "M-o" #'ace-window
+ ;;lispy
  (:after lispy
          (:map (lispy-mode-map lispy-mode-map-lispy)
                "C-n" #'lispy-kill
-               "M-p" #'forward-sexp
                "C-k" #'backward-char
-               "M-k" #'backward-sexp
-               "C-M-k" #'lispy-backward
-               "C-M-p" #'lispy-forward
+               "M-k" #'backward-word
+               "C-3" #'lispy-backward
+               "C-4" #'lispy-forward
                ";" nil
+               "M-M" nil
+               "M-o" nil
+               "C-<backspace>" #'backward-delete-char-untabify
                "[" #'lispy-brackets
-               "]" #'lispy-brackets-auto-wrap
-               "}" #'lispy-braces-auto-wrap))
-
+               "{" #'lispy-braces
+               "(" #'lispy-parens
+               "]" nil
+               "}" nil
+               ")" nil))
+ ;;copilot
+ (:after copilot
+         (:map copilot-completion-map
+               ("<tab>" #'copilot-accept-completion)
+               ("TAB" #'copilot-accept-completion)
+               ("C-TAB" #'copilot-accept-completion-by-word)
+               ("C-<tab>" #'copilot-accept-completion-by-word)
+               ("C-n" #'copilot-next-completion)
+               ("C-p" #'copilot-previous-completion)))
  ;;lsp
  (:after lsp-mode
          (:map lsp-mode-map
-               "s-SPC" #'lsp-find-definition
+               "M-SPC" #'lsp-find-definition
                "M-s-SPC" #'lsp-find-references))
-
  ;; dired
  (:after dired
          (:map dired-mode-map
                "C-o" nil))
-
  ;; cider
  (:after cider
          (:map cider-mode-map
