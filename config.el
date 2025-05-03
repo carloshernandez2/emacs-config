@@ -78,9 +78,7 @@
 ;;PERSONAL ---------------------
 
 ;;Projectile
-(setq projectile-project-search-path '("~/dev/nu"
-                                       "~/dev/nu/mini-meta-repo/packages")
-      projectile-enable-caching nil
+(setq projectile-enable-caching nil
       projectile-project-root-functions '(projectile-root-local
                                           projectile-root-top-down
                                           projectile-root-top-down-recurring
@@ -96,10 +94,14 @@
   (add-hook 'lsp-after-apply-edits-hook (lambda (&rest _) (save-buffer)))) ;; save buffers after renaming
 
 ;; Nu
-(let ((nudev-emacs-path "~/dev/nu/nudev/ides/emacs/"))
+(let ((nudev-emacs-path "~/dev/nu/nudev/ides/emacs/")
+      (nu-projects-path "~/dev/nu"))
   (when (file-directory-p nudev-emacs-path)
     (add-to-list 'load-path nudev-emacs-path)
-    (require 'nu nil t)))
+    (require 'nu nil t))
+  (when (file-directory-p nu-projects-path)
+    (add-to-list 'projectile-project-search-path nu-projects-path)
+    (add-to-list 'projectile-project-search-path "~/dev/nu/mini-meta-repo/packages")))
 
 ;;MAC
 (when (eq system-type 'darwin)
