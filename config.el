@@ -89,7 +89,8 @@
 (use-package! lsp-mode
   :commands lsp
   :config
-  (setq lsp-semantic-tokens-enable t)
+  (setq lsp-semantic-tokens-enable t
+        lsp-copilot-enabled t)
   (add-hook 'lsp-after-apply-edits-hook (lambda (&rest _) (save-buffer)))) ;; save buffers after renaming
 
 ;; Nu
@@ -126,16 +127,6 @@ If a region is active, run `cider-eval-region'."
 ;; compat flag lispy
 (after! lispy
   (setq lispy-compat '(cider edebug)))
-
-;; Github Copilot
-(use-package! copilot
-  :hook (prog-mode . copilot-mode)
-  :config
-  (add-to-list 'copilot-indentation-alist '(prog-mode 2))
-  (add-to-list 'copilot-indentation-alist '(org-mode 2))
-  (add-to-list 'copilot-indentation-alist '(text-mode 2))
-  (add-to-list 'copilot-indentation-alist '(clojure-mode 2))
-  (add-to-list 'copilot-indentation-alist '(emacs-lisp-mode 2)))
 
 ;; Key bindings
 (map!
@@ -174,20 +165,15 @@ If a region is active, run `cider-eval-region'."
                "]" nil
                "}" nil
                ")" nil))
- ;;copilot
- (:after copilot
-         (:map copilot-completion-map
-               ("<tab>" #'copilot-accept-completion)
-               ("TAB" #'copilot-accept-completion)
-               ("C-TAB" #'copilot-accept-completion-by-word)
-               ("C-<tab>" #'copilot-accept-completion-by-word)
-               ("C-n" #'copilot-next-completion)
-               ("C-p" #'copilot-previous-completion)))
  ;;lsp
  (:after lsp-mode
          (:map lsp-mode-map
                "M-SPC" #'lsp-find-definition
-               "M-s-SPC" #'lsp-find-references))
+               "M-s-SPC" #'lsp-find-references
+               "C-0" (lambda ()
+                       (interactive)
+                       (company-abort)
+                       (lsp-inline-completion-display))))
  ;; dired
  (:after dired
          (:map dired-mode-map
