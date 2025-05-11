@@ -80,10 +80,15 @@
 
 ;;Projectile
 (setq projectile-enable-caching nil
+      projectile-project-search-path nil
       projectile-project-root-functions '(projectile-root-local
                                           projectile-root-top-down
                                           projectile-root-top-down-recurring
                                           projectile-root-bottom-up))
+
+(let ((cs-primer-path "~/Documents/cs_primer/cs_primer/computer_networks/dns_in_depth"))
+  (when (file-directory-p cs-primer-path)
+    (add-to-list 'projectile-project-search-path cs-primer-path)))
 
 ;;LSP
 (use-package! lsp-mode
@@ -93,6 +98,15 @@
         lsp-copilot-enabled t)
   (add-hook 'lsp-after-apply-edits-hook (lambda (&rest _) (save-buffer)))) ;; save buffers after renaming
 
+(after! lsp-clangd
+  (setq lsp-clients-clangd-args
+        '("-j=3"
+          "--background-index"
+          "--clang-tidy"
+          "--completion-style=detailed"
+          "--header-insertion=never"
+          "--header-insertion-decorators=0"))
+  (set-lsp-priority! 'clangd 2))
 ;; Nu
 (let ((nudev-emacs-path "~/dev/nu/nudev/ides/emacs/")
       (nu-projects-path "~/dev/nu"))
@@ -101,7 +115,8 @@
     (require 'nu nil t))
   (when (file-directory-p nu-projects-path)
     (add-to-list 'projectile-project-search-path nu-projects-path)
-    (add-to-list 'projectile-project-search-path "~/dev/nu/mini-meta-repo/packages")))
+    (add-to-list 'projectile-project-search-path "~/dev/nu/mini-meta-repo/packages")
+    (add-to-list 'projectile-project-search-path "~/dev/nu/artemisia/modules")))
 
 ;;MAC
 (when (eq system-type 'darwin)
@@ -110,6 +125,20 @@
    ns-option-modifier 'meta
    ns-control-modifier 'super
    ns-function-modifier 'hyper))
+
+;;Dape
+(when (not (eq system-type 'darwin))
+  (use-package dape
+    :preface
+    ;; By default dape shares the same keybinding prefix as `gud'
+    ;; If you do not want to use any prefix, set it to nil.
+    (setq dape-key-prefix "\C-x\C-a")
+    :config
+    (add-hook 'dape-compile-hook 'kill-buffer))
+
+  (use-package repeat
+    :config
+    (repeat-mode)))
 
 ;; Cider functions and config
 (defun my-cider-eval-dwim ()
@@ -123,6 +152,9 @@ If a region is active, run `cider-eval-region'."
 (after! cider
   (setq cider-ns-code-reload-tool 'clj-reload)
   (setq cider-enrich-classpath t))
+
+;;disable smartparens
+(remove-hook 'doom-first-buffer-hook #'smartparens-global-mode)
 
 ;; compat flag lispy
 (after! lispy
@@ -147,6 +179,10 @@ If a region is active, run `cider-eval-region'."
  "M-M" #'mc/mark-next-like-this
  "M-i" #'iedit-mode
  "M-o" #'ace-window
+ ;;multiple-cursors
+ (:after multiple-cursors-core
+         (:map mc/keymap
+               "<return>" nil))
  ;;lispy
  (:after lispy
          (:map (lispy-mode-map lispy-mode-map-lispy)
