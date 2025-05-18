@@ -88,7 +88,9 @@
 
 (let ((cs-primer-path "~/Documents/cs_primer/cs_primer/computer_networks/dns_in_depth"))
   (when (file-directory-p cs-primer-path)
-    (add-to-list 'projectile-project-search-path cs-primer-path)))
+    (add-to-list 'projectile-project-search-path cs-primer-path)
+    (add-to-list 'projectile-project-search-path "~/Documents/cs_primer/cs_primer/introduction_to_network_programming")
+    (add-to-list 'projectile-project-search-path "~/Documents/cs_primer/cs_primer/relational_databases")))
 
 ;;LSP
 (use-package! lsp-mode
