@@ -181,6 +181,7 @@ If a region is active, run `cider-eval-region'."
  "M-M" #'mc/mark-next-like-this
  "M-i" #'iedit-mode
  "M-o" #'ace-window
+ "M-b" #'better-jumper-jump-backward
  ;;multiple-cursors
  (:after multiple-cursors-core
          (:map mc/keymap
