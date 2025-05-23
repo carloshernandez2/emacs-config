@@ -77,6 +77,7 @@
 ;;
 ;;PERSONAL ---------------------
 (setq read-process-output-max (* 1024 1024))
+(add-to-list 'safe-local-variable-values '(eval . (setenv "NU_COUNTRY" "br")))
 
 ;;Projectile
 (setq projectile-enable-caching nil
@@ -118,7 +119,8 @@
   (when (file-directory-p nu-projects-path)
     (add-to-list 'projectile-project-search-path nu-projects-path)
     (add-to-list 'projectile-project-search-path "~/dev/nu/mini-meta-repo/packages")
-    (add-to-list 'projectile-project-search-path "~/dev/nu/artemisia/modules")))
+    (add-to-list 'projectile-project-search-path "~/dev/nu/artemisia/modules")
+    (add-to-list 'projectile-project-search-path "~/dev/code_reviews")))
 
 ;;MAC
 (when (eq system-type 'darwin)
